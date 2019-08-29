@@ -18,6 +18,7 @@ external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/
 app = dash.Dash(
     __name__, external_stylesheets=external_stylesheets, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
 )
+server = app.server
 
 app.config.suppress_callback_exceptions = True
 app.title = 'SOSA App'

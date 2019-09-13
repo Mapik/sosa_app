@@ -8,14 +8,15 @@ import plotly.graph_objects as go
 def create_layout(df_offer_from):
   return html.Div([dcc.Graph(
       id='offer-from',
-      figure={
-          'data': [
-              {'x': df_offer_from['offer_from'], 'y': df_offer_from['N'], 'type': 'bar', 'name': 'N Offer from'},
-          ],
-          'layout': {
-              'title': 'Offer from'
-          }
-      }
+      figure=px.bar(df_offer_from, x="offer_from", y="N", barmode='stack')
+#      figure={
+#          'data': [
+#              {'x': df_offer_from['offer_from'], 'y': df_offer_from['N'], 'type': 'bar', 'name': 'N Offer from'},
+#          ],
+#          'layout': {
+#              'title': 'Offer from'
+#          }
+#      }
   )],
   className="page",)
 
@@ -32,11 +33,22 @@ def create_layout3(df_offer_from3):
       figure=px.bar(df_offer_from3, x="offer_from", y="N", color='fuel_type', barmode='stack')
   )],
   className="page",)
-  
-def full_layout(df_offer_from, df_offer_from2, df_offer_from3):
+
+def create_layout4(df_offer_from4):
+  return html.Div([dcc.Graph(
+      id='offer-from4',
+      figure = px.bar(df_offer_from4, x="mileage_bins", y="N", color="offer_from", barmode="group")
+  )],
+  className="page",)
+
+def full_layout(df_offer_from, df_offer_from2, df_offer_from3, df_offer_from4):
   return html.Div([
       create_layout(df_offer_from),
       create_layout2(df_offer_from2),
       create_layout3(df_offer_from3),
+      create_layout4(df_offer_from4),
       ]
       )
+  
+  
+  

@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import math 
+import datetime as dt
 
 def filter_data(df):
   df = df[[
@@ -30,23 +32,84 @@ def prepare_count(df,
                   do_sorting=False,
                   convert_to_string=False):
   """Prepare onedimensional count"""
+  print('{} - START prepare_count'.format(dt.datetime.now()))
+#  if column_name in ['price_value_pln_brutto','mileage']:
+#    bins = prepare_bins(df[column_name])
+#    df[column_name] = bins
   count = df.groupby([column_name])['N'].count()
   count = count.reset_index()
-  if additional_filters_1:
+  count['n_all'] = count['N'].sum()
+  count['perc']= round((count['N']/count['n_all'])*100,1)
+  count = count[[column_name, 'perc']]
+  if additional_filters_1: #odrzucam np. przypadki z 0 KM
     count = count[count[column_name]!=0]
-  if additional_filters_2:
-    count = count[count['N']>=5]
-  if do_sorting:
-    count = count.sort_values('N', ascending = False)
+  if additional_filters_2: #odrzucam dla czytelnosci jakies nieznaczace wartosci
+    count = count[count['perc']>=0.5]
+  if do_sorting: #sortowanie po wysokosci slupków
+    count = count.sort_values('perc', ascending = True)
     count = count.reset_index(drop=True)
   if convert_to_string:
     if column_name == 'engine_power':
       count[column_name] = count[column_name].map(str)+' KM'
     if column_name == 'engine_capacity_rounded':
       count[column_name] = 'poj. '+count[column_name].map(str)
+  print('{} - END prepare_count'.format(dt.datetime.now()))
   return count
 
-def prepare_bins(df, column_name):
+def vs_price_and_year(df,
+                      column_name):
+  """Prepare data for chart with price and prod year"""
+  pr_and_yr = df.groupby([column_name, 'prod_year'])['price_value_pln_brutto'].mean()
+  pr_and_yr = pr_and_yr.reset_index()
+  return pr_and_yr
+
+def vs_fuel_type(df,
+                 column_name):
+  fuel_type = df.groupby([column_name, 'fuel_type'])['N'].count().reset_index()
+  return fuel_type
+
+def vs_mileage(df,
+              column_name):
+  # wyliczanie 99 kwantyla przebiegu i zaokąglanie go w górę, zeby uzyska ładną iloć binów
+  q99 = df['mileage'].quantile(0.99)
+  rounding = str(q99).find('.') - 1
+  denominator = int('1' + ''.join(['0'] * rounding))
+  q99_for_ceiling = q99/denominator
+  q99_ceil = math.ceil(q99_for_ceiling)
+  q99_r = q99_ceil * denominator
+  #q99_r = round(q99, -5)
+  n_bins = (q99_r/(denominator/5))+1
+
+  df = df[df['mileage']<q99_r]
+
+  # dzielenie przebiegu na biny
+  
+  df['mileage_bins'] = pd.cut(df['mileage'], np.linspace(0, q99_r,n_bins))
+  df['mileage_bins'] = df.apply(lambda x: pd.Interval(x['mileage_bins'].left.astype(int), x['mileage_bins'].right.astype(int)), axis=1)
+  
+  grb = df.groupby(['mileage_bins', column_name])['N'].count().reset_index()
+  grb['mileage_bins'] = grb['mileage_bins'].astype(str)
+  
+  return grb
+
+def prepare_bins(variable):
+  # variable - pd.Series
+  # wyliczanie 99 kwantyla przebiegu i zaokąglanie go w górę, zeby uzyska ładną iloć binów
+  q99 = variable.quantile(0.99)
+  rounding = str(q99).find('.') - 1
+  denominator = int('1' + ''.join(['0'] * rounding))
+  q99_for_ceiling = q99/denominator
+  q99_ceil = math.ceil(q99_for_ceiling)
+  q99_r = q99_ceil * denominator
+  n_bins = (q99_r/(denominator/5))+1
+  #variable = variable[variable<q99_r]
+  # dzielenie przebiegu na biny
+  bins = pd.cut(variable, np.linspace(0, q99_r,n_bins))
+  bins = bins.apply(lambda x: pd.Interval(x.left.astype(int), x.right.astype(int)))
+  bins = bins.astype(str)
+  return bins
+
+def prepare_bins_not_nice(df, column_name):
   bins_df = df[[column_name, 'N']]
   caps_low = bins_df[column_name].quantile(0.0)
   caps_high = bins_df[column_name].quantile(0.99)

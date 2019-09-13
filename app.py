@@ -12,33 +12,36 @@ from pages import (
 from utils import read_data
 from utils import data_processing as dp
 from dash.exceptions import PreventUpdate
+from section import report_section as rs
+from config import config
+
+#=======================
+# Bootstrap
+#=======================
 
 external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css']
+
+#=======================
+# Server
+#=======================
 
 app = dash.Dash(
     __name__, external_stylesheets=external_stylesheets, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
 )
 server = app.server
 
+#=======================
+# Config
+#=======================
+
 app.config.suppress_callback_exceptions = True
 app.title = 'SOSA App'
 
+#=======================
+# index page
+#=======================
+
 index_page = html.Div([
-#    html.Div([
-#      html.Div([html.H1('SOSA App', className='display-4'), 
-#                html.P('Statystyki ofert sprzedaży aut', className='lead'),],
-#               className='container'),], 
-#      className='jumbotron jumbotron-fluid'),
-#    html.Div([
-#      html.H1('SOSA App', className='display-4'), 
-#      html.P('Statystyki ofert sprzedaży aut', className='lead'),
-#      ], 
-#      className='jumbotron'),
-#    html.Div([
-#      html.H1('SOSA App'), 
-#      html.P('Statystyki ofert sprzedaży aut'),
-#      ], 
-#      className='page-header'),
       html.Div([
           html.Div([dcc.Dropdown(
            id='select-maker',
@@ -49,7 +52,7 @@ index_page = html.Div([
                ],
            value=None,
            placeholder = 'Wybierz producenta'
-           ),], className='col'),
+           ),], className='col-sm'),
           html.Div([dcc.Dropdown(
            id='select-model',
            options=[
@@ -59,7 +62,7 @@ index_page = html.Div([
                ],
            value=None,
            placeholder = 'Wybierz model'
-           ),], className='col'),
+           ),], className='col-sm'),
           html.Div([
            dcc.Input(
               placeholder='Podaj adres e-mail...',
@@ -69,18 +72,20 @@ index_page = html.Div([
               className='form-control'
               ),
              html.Small('Adres e-mail jest opcjonalny', className='text-muted')
-              ], className='col'),
+              ], className='col-sm'),
           ], className='row form-group'),
       html.Div([
           html.Div([
               html.Button('Generuj raport', id='gen-report', className='btn btn-lg btn-outline-primary')
               ], className='col text-center')
           ],className='row form-group'),
-      dcc.Loading(id='loading-report',
-                  children=[html.Div(id='report-div')],
-                  type='circle')
+      html.Div(id='report-div')
     ], className='container')
 
+#=======================
+# app.layout
+#=======================
+      
 app.layout = html.Div([
   html.Div([
     html.Div([html.H1('SOSA App', className='display-4'), 
@@ -95,24 +100,29 @@ app.layout = html.Div([
               type='circle')
 ])
 
+#=======================
+# section menu
+#=======================
 
-offer_from_layout = html.Div(html.H3('wybrano offer from'))
-version_layout = html.Div(html.H3('wybrano version'))
-nav = html.Div([
-  html.Div([dcc.Link('Overview', href='overview'),], className='col'),
-  html.Div([dcc.Link('Offer from', href='offer-from'),], className='col'),
-  html.Div([dcc.Link('Version', href='version'),], className='col'),
-    ], className='row')
-
+def generate_menu_items():
+  html_ul = []
+  for href, params in config.section_items_dict.items():
+    class_value = 'nav-link'
+    html_ul.append(html.Li([dcc.Link(params['menu_text'], href=href, className=class_value, id='nav-{}-btn'.format(href))], className='nav-item'),)
+  return html_ul
+  
 nav1 = html.Div([
-    html.Ul([
-        html.Li([dcc.Link('Overview', href='overview', className='nav-link', id='nav-overview-btn')], className='nav-item'),
-        html.Li([dcc.Link('Offer from', href='offer-from', className='nav-link', id='nav-offer-from-btn')], className='nav-item'),
-        html.Li([dcc.Link('Version', href='version', className='nav-link', id='nav-version-btn')], className='nav-item'),
-        ], className='nav nav-pills justify-content-center')
+    html.Ul(generate_menu_items(), className='nav nav-pills justify-content-center')
     ])
 
-#nav nav-pills nav-fill justify-content-center
+
+#=======================
+# callbacks
+#=======================
+
+#----------
+# update model menu
+#----------
 
 @app.callback(
     Output(component_id='select-model', component_property='options'),
@@ -130,6 +140,10 @@ def update_models(maker):
     else: 
         raise PreventUpdate
 
+#----------
+# update data div
+#----------
+
 @app.callback(
     Output(component_id='data-div', component_property='children'),
     [Input(component_id='gen-report', component_property='n_clicks')],
@@ -141,21 +155,14 @@ def get_data(nclicks, maker, model):
     raise PreventUpdate
   else:
     df = read_data.read_data_from_excel(maker, model)
-    df_offer_from = dp.prepare_count(df, 'offer_from')
-    df_offer_from2 = df.groupby(['offer_from', 'prod_year'])['price_value_pln_brutto'].mean()
-    df_offer_from2 = df_offer_from2.reset_index()
-    df_offer_from3 = df.groupby(['offer_from', 'fuel_type'])['N'].count().reset_index()
-    df_version = dp.prepare_count(df, 'version')
-
     datasets = {
          'df': df.to_json(orient='split', date_format='iso'),
-         'df_offer_from': df_offer_from.to_json(orient='split', date_format='iso'),
-         'df_offer_from2': df_offer_from2.to_json(orient='split', date_format='iso'),
-         'df_offer_from3': df_offer_from3.to_json(orient='split', date_format='iso'),
-         'df_version': df_version.to_json(orient='split', date_format='iso'),
      }
-    
     return json.dumps(datasets)
+
+#----------
+# update report div
+#----------
 
 @app.callback(
     Output(component_id='report-div', component_property='children'),
@@ -173,59 +180,56 @@ def generate_report(n_clicks, maker, model):
         dcc.Loading(id='loading-rep-section',
                     children=[html.Div(id='report-section')],
                     type='circle'),
-        html.Div(id='report-section1')], 
-        )
+#        html.Div(id='report-section'),
+        ])
     return report_page
+
+#----------
+# update url when report is generated
+#----------
+
+@app.callback(
+    Output('url', 'pathname'),
+    [Input('report-div', 'children')]
+    )
+def update_url_aft_rep_gen(n_clicks):
+  return '/overview'
+
+#----------
+# update section div
+#----------
 
 @app.callback(
     Output(component_id='report-section', component_property='children'),
     [Input(component_id='url', component_property='pathname'),
-#     Input(component_id='offer-from-btn', component_property='n_clicks_timestamp'),
      Input(component_id='data-div', component_property='children')]
 )
 def update_report_section(pathname, jsonified_cleaned_data):
-#  return(html.Div([html.H3(version_btn), html.H3(offer_from_btn)]))
   datasets = json.loads(jsonified_cleaned_data)
-  #n_offers = pd.read_json(datasets['df']).len()
-  if pathname == '/offer-from':
-    df_offer_from = pd.read_json(datasets['df_offer_from'], orient='split')
-    df_offer_from2 = pd.read_json(datasets['df_offer_from2'], orient='split')
-    df_offer_from3 = pd.read_json(datasets['df_offer_from3'], orient='split')
-    return offer_from.full_layout(df_offer_from, df_offer_from2, df_offer_from3)
-  elif pathname == '/version':
-    df_version = pd.read_json(datasets['df_version'], orient='split')
-    return version.create_layout(df_version)
-  else:
-    return html.Div([html.P('Liczba ogłoszeń w próbie: XYZ')])
+  return rs.generate_section(pathname, pd.read_json(datasets['df'], orient='split'))
+
+#----------
+# update buttons pills
+#----------
+
+def generate_callbacks_outputs():
+  outputs = []
+  for href, text in config.section_items_dict.items():
+    outputs.append(Output(component_id='nav-{}-btn'.format(href), component_property='className'))
+  return outputs
 
 @app.callback(
-    Output(component_id='nav-overview-btn', component_property='className'),
-    [Input(component_id='url', component_property='pathname')])
-def update_nav_button_overview(pathname):
-  if pathname == '/overview':
-    return 'nav-link active'
-  elif pathname == '/':
-    return 'nav-link active'
-  else:
-    return 'nav-link'
-
-@app.callback(
-    Output(component_id='nav-offer-from-btn', component_property='className'),
-    [Input(component_id='url', component_property='pathname')])
-def update_nav_button_offer_from(pathname):
-  if pathname == '/offer-from':
-    return 'nav-link active'
-  else:
-    return 'nav-link'
-
-@app.callback(
-    Output(component_id='nav-version-btn', component_property='className'),
+    generate_callbacks_outputs(),
     [Input(component_id='url', component_property='pathname')])
 def update_nav_button_version(pathname):
-  if pathname == '/version':
-    return 'nav-link active'
-  else:
-    return 'nav-link'
+  class_list = []
+  #wygenerwanie 16 class
+  for href, text in config.section_items_dict.items():
+    if href in pathname:
+      class_list.append('nav-link active')
+    else:
+      class_list.append('nav-link')
+  return class_list
       
 if __name__ == '__main__':
     app.run_server(debug=True)

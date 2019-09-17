@@ -31,7 +31,7 @@ def prepare_count(df,
                   additional_filters_2=False, 
                   do_sorting=False,
                   convert_to_string=False):
-  """Prepare onedimensional count"""
+  """Prepare onedimensional count for categorical columns"""
   print('{} - START prepare_count'.format(dt.datetime.now()))
 #  if column_name in ['price_value_pln_brutto','mileage']:
 #    bins = prepare_bins(df[column_name])
@@ -102,12 +102,26 @@ def prepare_bins(variable):
   q99_ceil = math.ceil(q99_for_ceiling)
   q99_r = q99_ceil * denominator
   n_bins = (q99_r/(denominator/5))+1
-  #variable = variable[variable<q99_r]
+  variable = variable[variable<q99_r]
   # dzielenie przebiegu na biny
   bins = pd.cut(variable, np.linspace(0, q99_r,n_bins))
   bins = bins.apply(lambda x: pd.Interval(x.left.astype(int), x.right.astype(int)))
-  bins = bins.astype(str)
+  #bins = bins.astype(str)
   return bins
+
+def prepare_bins_one_dim(data, 
+                         column_name):
+  """One-dimensional count for continuos variables - milegae and price"""
+  bins = prepare_bins(data[column_name])
+  grpb = bins.value_counts()
+  grpb = grpb.reset_index()
+  grpb = grpb.rename(columns={'index':column_name, column_name:'N'})
+  grpb = grpb.sort_values(column_name, ascending = True)
+  grpb[column_name] = grpb[column_name].astype('str')
+  grpb['n_all'] = grpb['N'].sum()
+  grpb['perc']= round((grpb['N']/grpb['n_all'])*100,1)
+  grpb = grpb[[column_name, 'perc']]
+  return grpb
 
 def prepare_bins_not_nice(df, column_name):
   bins_df = df[[column_name, 'N']]

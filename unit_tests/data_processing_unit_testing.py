@@ -9,6 +9,8 @@ pio.renderers.default = "browser"
 import plotly.express as px
 import math
 import plotly.graph_objects as go
+from section import report_section as rs
+from config import config
 
 math.ceil(34509)
 
@@ -138,3 +140,68 @@ bins = bins.apply(lambda x: pd.Interval(x.left.astype(int), x.right.astype(int))
 bins = bins.astype(str)
 
 dp.prepare_count(df, 'price_value_pln_brutto')
+
+
+# sprawdzenie dlaczego nie działa mielage
+
+data = read_data.read_data_from_excel('vw', 'Passat')
+data['mileage_bins'] = dp.prepare_bins(data['mileage'])
+data['mileage'] = data['mileage_bins']
+df_one_dim = dp.prepare_count(data, 'mileage')
+figure=px.bar(df_one_dim, x='mileage', y="perc", barmode='stack')
+figure.show()
+
+
+# one-dim data dla ciaglych
+
+data = read_data.read_data_from_excel('vw', 'Passat')
+column_name = 'mileage'
+bins = dp.prepare_bins(data[column_name])
+grpb = bins.value_counts()
+grpb = grpb.reset_index()
+grpb = grpb.rename(columns={'index':column_name, 'mileage':'N'})
+grpb = grpb.sort_values(column_name, ascending = True)
+grpb[column_name] = grpb[column_name].astype('str')
+grpb['n_all'] = grpb['N'].sum()
+grpb['perc']= round((grpb['N']/grpb['n_all'])*100,1)
+grpb = grpb[[column_name, 'perc']]
+
+
+# cena
+
+data = read_data.read_data_from_excel('vw', 'Passat')
+column_name = 'price_value_pln_brutto'
+df_one_dim = dp.prepare_bins_one_dim(data, column_name)
+
+bins = dp.prepare_bins(data[column_name])
+grpb = bins.value_counts()
+grpb = grpb.reset_index()
+grpb = grpb.rename(columns={'index':column_name, column_name:'N'})
+grpb = grpb.sort_values(column_name, ascending = True)
+grpb[column_name] = grpb[column_name].astype('str')
+grpb['n_all'] = grpb['N'].sum()
+grpb['perc']= round((grpb['N']/grpb['n_all'])*100,1)
+grpb = grpb[[column_name, 'perc']]
+
+
+#point and click
+
+data = read_data.read_data_from_excel('vw', 'Passat')
+section_name = 'version'
+pathname = 'version'
+df_one_dim = dp.prepare_count(data, section_name, config.section_items_dict[pathname]['dppc_additional_filters_1'], config.section_items_dict[pathname]['dppc_additional_filters_2'], config.section_items_dict[pathname]['dppc_do_sorting'], config.section_items_dict[pathname]['dppc_convert_to_string'],)
+data = df_one_dim 
+
+figure=go.Figure(
+    data = [go.Bar(x=data[section_name], y=data['perc'])],
+    layout_clickmode = 'event+select'
+    )
+figure.show()
+
+
+{'data':[{
+          'x':data[section_name],
+          'y':'perc',
+          'mode':'bar'}],
+        'layout':{'clickmode': 'event+select'}}
+figure.show()

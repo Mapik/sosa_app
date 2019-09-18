@@ -16,6 +16,14 @@ from section import report_section as rs
 from config import config
 
 #=======================
+# Data
+#=======================
+
+vw_passat = read_data.read_data_from_excel('vw', 'Passat')
+toyota_avensis = read_data.read_data_from_excel('toyota', 'Avensis')
+ford_mondeo = read_data.read_data_from_excel('ford', 'Mondeo')
+
+#=======================
 # Bootstrap
 #=======================
 
@@ -154,11 +162,12 @@ def get_data(nclicks, maker, model):
   if model is None:
     raise PreventUpdate
   else:
-    df = read_data.read_data_from_excel(maker, model)
-    datasets = {
-         'df': df.to_json(orient='split', date_format='iso'),
-     }
-    return json.dumps(datasets)
+    return None
+#    df = read_data.read_data_from_excel(maker, model)
+#    datasets = {
+#         'df': df.to_json(orient='split', date_format='iso'),
+#     }
+#    return json.dumps(datasets)
 
 #----------
 # update report div
@@ -202,12 +211,21 @@ def update_url_aft_rep_gen(n_clicks):
 @app.callback(
     Output(component_id='report-section', component_property='children'),
     [Input(component_id='url', component_property='pathname'),
-     Input(component_id='data-div', component_property='children')]
+     Input(component_id='data-div', component_property='children')],
+    [State(component_id='select-maker', component_property='value'),
+     State(component_id='select-model', component_property='value'),]
 )
-def update_report_section(pathname, jsonified_cleaned_data):
-  datasets = json.loads(jsonified_cleaned_data)
-  return rs.generate_section(pathname, pd.read_json(datasets['df'], orient='split'))
-
+def update_report_section(pathname, jsonified_cleaned_data, maker, model):
+#  datasets = json.loads(jsonified_cleaned_data)
+#  return rs.generate_section(pathname, pd.read_json(datasets['df'], orient='split'))
+  if model == "Avensis":
+    data = toyota_avensis
+  elif model == "Passat":
+    data = vw_passat
+  elif model == "Mondeo":
+    data = ford_mondeo
+  return rs.generate_section(pathname, data)
+  
 #----------
 # update buttons pills
 #----------

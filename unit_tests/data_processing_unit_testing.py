@@ -205,3 +205,22 @@ figure.show()
           'mode':'bar'}],
         'layout':{'clickmode': 'event+select'}}
 figure.show()
+
+
+# wyfiltrowanie aut
+
+all_models = read_data.read_data_from_csv()
+a = all_models.groupby(['maker', 'model'])['N'].count().sort_values(ascending = False).reset_index()
+a = a[a['N']>=50]
+makers = pd.Series(a['maker'].unique())
+makers_list = []
+for i in makers:
+  makers_list.append({'label': i, 'value': i})
+models_dict = {}  
+for i in makers:
+  models_dict[i] = []
+  for model in a[a['maker']==i]['model']:
+    models_dict[i].append({'label': model, 'value': model})
+
+b = count.groupby((['maker', 'model'])).count()
+b.index

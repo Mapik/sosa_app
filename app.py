@@ -15,13 +15,6 @@ from dash.exceptions import PreventUpdate
 from section import report_section as rs
 from config import config
 
-#=======================
-# Data
-#=======================
-
-vw_passat = read_data.read_data_from_excel('vw', 'Passat')
-toyota_avensis = read_data.read_data_from_excel('toyota', 'Avensis')
-ford_mondeo = read_data.read_data_from_excel('ford', 'Mondeo')
 
 #=======================
 # Bootstrap
@@ -39,11 +32,44 @@ app = dash.Dash(
 server = app.server
 
 #=======================
+# Data
+#=======================
+
+#vw_passat = read_data.read_data_from_excel('vw', 'Passat')
+#toyota_avensis = read_data.read_data_from_excel('toyota', 'Avensis')
+#ford_mondeo = read_data.read_data_from_excel('ford', 'Mondeo')
+all_models = read_data.read_data_from_csv()
+
+#=======================
+# Define makers and models
+#=======================
+
+# wybranie dostępnych marek i modeli z pliku
+# docelowo do zmiany - bez sensu, żeby za każdym razem to sprawdzać
+
+a = all_models.groupby(['maker', 'model'])['N'].count().sort_values(ascending = False).reset_index()
+a = a[a['N']>=50]
+makers = pd.Series(a['maker'].unique()).sort_values()
+makers_list = []
+for i in makers:
+  makers_list.append({'label': i, 'value': i})
+models_dict = {}  
+for i in makers:
+  models_dict[i] = []
+  for model in a[a['maker']==i]['model'].sort_values():
+    models_dict[i].append({'label': model, 'value': model})
+
+
+#=======================
 # Config
 #=======================
 
 app.config.suppress_callback_exceptions = True
 app.title = 'SOSA App'
+
+
+
+
 
 #=======================
 # index page
@@ -53,21 +79,18 @@ index_page = html.Div([
       html.Div([
           html.Div([dcc.Dropdown(
            id='select-maker',
-           options=[
-               {'label': 'VW', 'value': 'VW'},
-               {'label': 'Toyota', 'value': 'Toyota'},
-               {'label': 'Ford', 'value': 'Ford'}
-               ],
+           options=makers_list,
+#           [
+#               {'label': 'VW', 'value': 'VW'},
+#               {'label': 'Toyota', 'value': 'Toyota'},
+#               {'label': 'Ford', 'value': 'Ford'}
+#               ],
            value=None,
            placeholder = 'Wybierz producenta'
            ),], className='col-sm'),
           html.Div([dcc.Dropdown(
            id='select-model',
-           options=[
-               {'label': 'Passat', 'value': 'Passat'},
-               {'label': 'Mondeo', 'value': 'Mondeo'},
-               {'label': 'Avensis', 'value': 'Avensis'}
-               ],
+           options=[],
            value=None,
            placeholder = 'Wybierz model'
            ),], className='col-sm'),
@@ -139,12 +162,14 @@ nav1 = html.Div([
 def update_models(maker):
     if maker is None:
         raise PreventUpdate
-    elif maker == 'VW':
-      return [{'label': 'Passat', 'value': 'Passat'}]
-    elif maker == 'Toyota':
-      return [{'label': 'Avensis', 'value': 'Avensis'}]
-    elif maker == 'Ford':
-      return [{'label': 'Mondeo', 'value': 'Mondeo'}]
+    elif maker is not None:
+      return models_dict[maker]
+#    elif maker == 'VW':
+#      return [{'label': 'Passat', 'value': 'Passat'}]
+#    elif maker == 'Toyota':
+#      return [{'label': 'Avensis', 'value': 'Avensis'}]
+#    elif maker == 'Ford':
+#      return [{'label': 'Mondeo', 'value': 'Mondeo'}]
     else: 
         raise PreventUpdate
 
@@ -218,12 +243,13 @@ def update_url_aft_rep_gen(n_clicks):
 def update_report_section(pathname, jsonified_cleaned_data, maker, model):
 #  datasets = json.loads(jsonified_cleaned_data)
 #  return rs.generate_section(pathname, pd.read_json(datasets['df'], orient='split'))
-  if model == "Avensis":
-    data = toyota_avensis
-  elif model == "Passat":
-    data = vw_passat
-  elif model == "Mondeo":
-    data = ford_mondeo
+#  if model == "Avensis":
+#    data = toyota_avensis
+#  elif model == "Passat":
+#    data = vw_passat
+#  elif model == "Mondeo":
+#    data = ford_mondeo
+  data = all_models[all_models['model']==model]
   return rs.generate_section(pathname, data)
   
 #----------

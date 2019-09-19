@@ -101,7 +101,7 @@ def prepare_bins(variable):
   q99_for_ceiling = q99/denominator
   q99_ceil = math.ceil(q99_for_ceiling)
   q99_r = q99_ceil * denominator
-  n_bins = (q99_r/(denominator/5))+1
+  n_bins = (q99_r/(denominator/4))+1
   variable = variable[variable<q99_r]
   # dzielenie przebiegu na biny
   bins = pd.cut(variable, np.linspace(0, q99_r,n_bins))

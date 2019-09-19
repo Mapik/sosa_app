@@ -48,11 +48,11 @@ def generate_section(pathname, data):
 
 def create_layout(df_offer_from, section_name):
   print('{} - START chart 1'.format(dt.datetime.now()))
-  section_output = dcc.Loading(id='loading-data',
-                               children=[html.Div([dcc.Graph(id='offer-from', figure=px.bar(df_offer_from, x=section_name, y="perc", barmode='stack'))])],
-                               type='circle')
-
-  return section_output 
+  return html.Div([dcc.Graph(
+      id='offer-from',
+      figure=px.bar(df_offer_from, x=section_name, y="perc", barmode='stack')
+  )],
+  className="page",)
 
 def create_one_dim_chart(data, section_name):
   print('{} - START chart onedim'.format(dt.datetime.now()))
@@ -79,31 +79,29 @@ def create_one_dim_chart2(data, section_name):
   
 def create_layout2(df_offer_from2, section_name):
   print('{} - START chart 2'.format(dt.datetime.now()))
-  section_output = dcc.Loading(id='loading-data',
-                               children=[html.Div([dcc.Graph(id='offer-from2',figure=px.bar(df_offer_from2, x="prod_year", y="price_value_pln_brutto", color=section_name, barmode='group').update(layout={'clickmode':'event+select'}))])],
-                               type='circle')
-
-  return section_output 
-  
+  return html.Div([dcc.Graph(
+      id='offer-from2',
+      figure=px.bar(df_offer_from2, x="prod_year", y="price_value_pln_brutto", color=section_name, barmode='group').update(layout={'clickmode':'event+select'})
+  )],
+  className="page",)
   
 def create_layout3(df_offer_from3, section_name):
   print('{} - START chart 3'.format(dt.datetime.now()))
   fig = px.bar(df_offer_from3, x=section_name, y="N", color='fuel_type', barmode='stack')
   fig.layout.clickmode = 'event+select'
-  section_output = dcc.Loading(id='loading-data',
-                               children=[html.Div([dcc.Graph(id='offer-from3',figure=fig)])],
-                               type='circle')
-
-  return section_output 
+  return html.Div([dcc.Graph(
+      id='offer-from3',
+      figure=fig
+  )],
+  className="page",)
 
 def create_layout4(df_offer_from4, section_name):
   print('{} - START chart 4'.format(dt.datetime.now()))
-  section_output = dcc.Loading(id='loading-data',
-                               children=[html.Div([dcc.Graph(id='offer-from4',figure = px.bar(df_offer_from4, x="mileage_bins", y="N", color=section_name, barmode="group"))])],
-                               type='circle')
-
-  return section_output 
-  
+  return html.Div([dcc.Graph(
+      id='offer-from4',
+      figure = px.bar(df_offer_from4, x="mileage_bins", y="N", color=section_name, barmode="group")
+  )],
+  className="page",)
 
 def full_layout(df_offer_from, df_offer_from2, df_offer_from3, df_offer_from4, section_name):
   return html.Div([

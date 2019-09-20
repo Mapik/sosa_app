@@ -222,5 +222,3 @@ for i in makers:
   for model in a[a['maker']==i]['model']:
     models_dict[i].append({'label': model, 'value': model})
 
-b = count.groupby((['maker', 'model'])).count()
-b.index

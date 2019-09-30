@@ -222,3 +222,31 @@ for i in makers:
   for model in a[a['maker']==i]['model']:
     models_dict[i].append({'label': model, 'value': model})
 
+#srednia cena w roczniku/wersji
+df = read_data.read_data_from_csv()
+df = df[df['maker'] == 'BMW']
+df = df[df['model'] == 'Seria 3']
+
+pr_and_yr_mean = df.groupby(['prod_year'])['price_value_pln_brutto'].mean()
+pr_and_yr_max = df.groupby(['prod_year'])['price_value_pln_brutto'].mean()
+pr_and_yr_max = df.groupby(['prod_year'])['price_value_pln_brutto'].mean()
+pr_and_yr = pr_and_yr_mean.reset_index()
+px.box(df, x='prod_year', y='price_value_pln_brutto')    
+fig = px.line(pr_and_yr, x='prod_year', y='price_value_pln_brutto')
+fig.data[0].update(mode='markers+lines')
+fig
+px.scatter(df, x='mileage', y='price_value_pln_brutto')
+
+round(df['mileage'],-3)
+
+#srednia cena za wersje
+
+data['price_value_pln_brutto'] = round(data['price_value_pln_brutto'], -3)
+data['milage'] = round(data['mileage'], -3)
+price_and_year = data[data['price_value_pln_brutto']<data['price_value_pln_brutto'].quantile(0.99)]
+price_and_version = price_and_year.sort_values('version')
+mileage_and_year = data[data['mileage']<data['mileage'].quantile(0.99)]
+mileage_and_version = mileage_and_year.sort_values('version')
+mileage_and_version_fig = px.box(mileage_and_version, x='version', y='mileage')
+mileage_mean = data.groupby(['version'])['mileage'].mean()
+mileage_mean = mileage_mean.reset_index()

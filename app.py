@@ -13,6 +13,7 @@ from utils import read_data
 from utils import data_processing as dp
 from dash.exceptions import PreventUpdate
 from section import report_section as rs
+from section import report_section_new as rsn
 from config import config
 
 
@@ -35,9 +36,6 @@ server = app.server
 # Data
 #=======================
 
-#vw_passat = read_data.read_data_from_excel('vw', 'Passat')
-#toyota_avensis = read_data.read_data_from_excel('toyota', 'Avensis')
-#ford_mondeo = read_data.read_data_from_excel('ford', 'Mondeo')
 all_models = read_data.read_data_from_csv()
 
 #=======================
@@ -80,11 +78,6 @@ index_page = html.Div([
           html.Div([dcc.Dropdown(
            id='select-maker',
            options=makers_list,
-#           [
-#               {'label': 'VW', 'value': 'VW'},
-#               {'label': 'Toyota', 'value': 'Toyota'},
-#               {'label': 'Ford', 'value': 'Ford'}
-#               ],
            value=None,
            placeholder = 'Wybierz producenta'
            ),], className='col-sm'),
@@ -164,12 +157,6 @@ def update_models(maker):
         raise PreventUpdate
     elif maker is not None:
       return models_dict[maker]
-#    elif maker == 'VW':
-#      return [{'label': 'Passat', 'value': 'Passat'}]
-#    elif maker == 'Toyota':
-#      return [{'label': 'Avensis', 'value': 'Avensis'}]
-#    elif maker == 'Ford':
-#      return [{'label': 'Mondeo', 'value': 'Mondeo'}]
     else: 
         raise PreventUpdate
 
@@ -188,11 +175,6 @@ def get_data(nclicks, maker, model):
     raise PreventUpdate
   else:
     return None
-#    df = read_data.read_data_from_excel(maker, model)
-#    datasets = {
-#         'df': df.to_json(orient='split', date_format='iso'),
-#     }
-#    return json.dumps(datasets)
 
 #----------
 # update report div
@@ -209,7 +191,7 @@ def generate_report(n_clicks, maker, model):
     raise PreventUpdate
   else:
     report_page = html.Div([
-        html.Div([html.H3('Wywietlam raport dla: {} {}'.format(maker, model)),]),
+        html.Div([html.H1('Wywietlam raport dla: {} {}'.format(maker, model)),]),
         html.Div([nav1]),
         dcc.Loading(id='loading-rep-section',
                     children=[html.Div(id='report-section')],
@@ -241,16 +223,8 @@ def update_url_aft_rep_gen(n_clicks):
      State(component_id='select-model', component_property='value'),]
 )
 def update_report_section(pathname, jsonified_cleaned_data, maker, model):
-#  datasets = json.loads(jsonified_cleaned_data)
-#  return rs.generate_section(pathname, pd.read_json(datasets['df'], orient='split'))
-#  if model == "Avensis":
-#    data = toyota_avensis
-#  elif model == "Passat":
-#    data = vw_passat
-#  elif model == "Mondeo":
-#    data = ford_mondeo
   data = all_models[all_models['model']==model]
-  return rs.generate_section(pathname, data)
+  return rsn.generate_section(pathname, data)
   
 #----------
 # update buttons pills

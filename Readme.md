@@ -12,67 +12,41 @@
 
 # Description
 
-- Private & hobby project aiming to help manage farms;
-- https://agrome.herokuapp.com/ is mobile friendly web application build on Ruby on Rails framework;
-- object-relational database system based on Postgresql;
-- front end build with Zurb Foundation as well as with SCSS and jQuery;
-- version control with git and Bitbucket/Github;
-- Linux based development environment with Sublime as main text editor;
-- self-development in programming, managing projects and meeting end user expectations;
-- Marketing automation with Mailchimp;
-
-# Features
-
-- registering new user
-- logging in 
-- reseting password 
-- adding fields, herds, machinery, buildings
-- recording activities for all above entities 
-- viewing recorded activities
-- following other users activities 
+- Private & hobby project.
+- Aim of the project was to learn plotly/dash library - https://plotly.com/
+- Current version is only a prototype. Work is still in progress. The current goal is to make it prettier.
+- Dashboards present statistics in 3 sections: general data, production year and version, price & mileage.
+- Each section will contain dedicated charts.
+- At this stage, data come from csv file. To be change into database later on.
+- It uses pandas library for some calculations. 
+- Possibility to filter different car makers and models.
 
 
 # Technology stack
 
-* Ruby on Rails
-* Postgresql
-* JavaScript
-* Zurb Foundation
+* Python
+<img src="https://www.python.org/static/community_logos/python-logo.png">
+
+* Plotly/Dash
+<img src="https://images.prismic.io/plotly-marketing-website/bd1f702a-b623-48ab-a459-3ee92a7499b4_logo-plotly.svg?auto=compress,format">
+
+* Pandas 
+<img src="https://pandas.pydata.org/static/img/pandas.svg">
+
+* Bootstrap
+<img src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-social.png">
 
 # Screenshots
 
-#### Log in page
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-02-36.png">
+#### Sections
+<img src="https://github.com/Mapik/sosa_app/blob/master/resources/images/sections.png">
 <br/>
 
-#### Register page
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-02-58.png">
+#### Chart example 1
+<img src="https://github.com/Mapik/sosa_app/blob/master/resources/images/chart1.png">
 <br/>
 
-#### Dashboard
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-03-14.png">
+#### Chart example 2
+<img src="https://github.com/Mapik/sosa_app/blob/master/resources/images/chart3.png">
 <br/>
 
-#### Users
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-03-22.png">
-<br/>
-
-#### Field view (no fields)
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-03-34.png">
-<br/>
-
-#### Add field form
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-04-00.png">
-<br/>
-
-#### Record activity form
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-04-59.png">
-<br/>
-
-#### Activity view
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-05-22.png">
-<br/>
-
-#### Recorded activities
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-05-34.png">
-<br/>

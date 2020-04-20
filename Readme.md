@@ -25,16 +25,16 @@
 # Technology stack
 
 * Python
-<img src="https://www.python.org/static/community_logos/python-logo.png" height="100">
+<img src="https://www.python.org/static/community_logos/python-logo.png" height="50">
 
 * Plotly/Dash
-<img src="https://images.prismic.io/plotly-marketing-website/bd1f702a-b623-48ab-a459-3ee92a7499b4_logo-plotly.svg?auto=compress,format" height="100">
+<img src="https://images.prismic.io/plotly-marketing-website/bd1f702a-b623-48ab-a459-3ee92a7499b4_logo-plotly.svg?auto=compress,format" height="50">
 
 * Pandas 
-<img src="https://pandas.pydata.org/static/img/pandas.svg" height="100">
+<img src="https://pandas.pydata.org/static/img/pandas.svg" height="50">
 
 * Bootstrap
-<img src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-social.png" height="100">
+<img src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-social.png" height="50">
 
 # Screenshots
 

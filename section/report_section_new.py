@@ -27,6 +27,7 @@ def generate_section(pathname, data):
                                          config.features_dict[feature_dict_item]['dppc_convert_to_string'],)
     data['price_value_pln_brutto'] = round(data['price_value_pln_brutto'], -3)
     data['mileage'] = round(data['mileage'], -3)
+    data['version'] = data['version'].fillna(value='NA')
     price_and_year = data[data['price_value_pln_brutto']<data['price_value_pln_brutto'].quantile(0.99)]
     price_and_version = price_and_year.sort_values('version')
     mileage_and_year = data[data['mileage']<data['mileage'].quantile(0.99)]

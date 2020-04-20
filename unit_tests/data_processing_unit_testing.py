@@ -241,12 +241,27 @@ round(df['mileage'],-3)
 
 #srednia cena za wersje
 
+df = read_data.read_data_from_csv()
+df = df[df['maker'] == 'Toyota']
+df = df[df['model'] == 'Verso']
+data = df
 data['price_value_pln_brutto'] = round(data['price_value_pln_brutto'], -3)
-data['milage'] = round(data['mileage'], -3)
+data['mileage'] = round(data['mileage'], -3)
 price_and_year = data[data['price_value_pln_brutto']<data['price_value_pln_brutto'].quantile(0.99)]
 price_and_version = price_and_year.sort_values('version')
 mileage_and_year = data[data['mileage']<data['mileage'].quantile(0.99)]
 mileage_and_version = mileage_and_year.sort_values('version')
-mileage_and_version_fig = px.box(mileage_and_version, x='version', y='mileage')
-mileage_mean = data.groupby(['version'])['mileage'].mean()
+
+mileage_and_year_fig = px.box(mileage_and_year, x='prod_year', y='mileage')
+mileage_mean = mileage_and_year.groupby(['prod_year'])['mileage'].mean()
 mileage_mean = mileage_mean.reset_index()
+mileage_and_prod_year_mean = px.line(mileage_mean, x='prod_year', y='mileage')
+mileage_and_prod_year_mean.data[0].update(mode='markers+lines')
+mileage_and_year_fig.append_trace(mileage_and_prod_year_mean.data[0],None,None)
+
+mileage_and_version_fig = px.box(mileage_and_version, x='version', y='mileage')#, points='all', hover_name='index')
+mileage_mean = mileage_and_version.groupby(['version'])['mileage'].mean()
+mileage_mean = mileage_mean.reset_index()
+mileage_and_version_mean = px.line(mileage_mean, x='version', y='mileage')
+mileage_and_version_mean.data[0].update(mode='markers+lines')
+mileage_and_version_fig.append_trace(mileage_and_version_mean.data[0],None,None)

@@ -1,12 +1,12 @@
-<a href="https://agrome.herokuapp.com/"><img src="https://github.com/Mapik/agrome/blob/master/public/images/Logo/logo.png" title="Agrome" alt="Agrome"></a>
+<a href="https://sosa-app-pl.herokuapp.com/overview"><img src="https://github.com/Mapik/sosa_app/blob/master/resources/images/logo.png?raw=true" title="SOSA App" alt="SOSA App"></a>
 
 
-# Agrome 
-> Farm Activity Tracker
+# SOSA App
+> Car Listings Statistics - https://sosa-app-pl.herokuapp.com/overview
 
 <br/>
 
-<img src="https://github.com/Mapik/agrome/blob/master/vendor/assets/Screenshot%20from%202020-02-06%2007-01-45.png">
+<img src="https://github.com/Mapik/sosa_app/blob/master/resources/images/chart2.png">
 
 <br/>
 
